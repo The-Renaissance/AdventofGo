@@ -38,8 +38,16 @@ func checkPasswordPart1(min, max int, character, password string) bool {
 	return min <= count && count <= max
 }
 
+func checkPasswordPart2(pos1, pos2 int, character, password string) bool {
+	return (password[pos1-1] == character[0]) != (password[pos2-1] == character[0])
+}
+
 func part1(input []string) int {
 	return solvePart(input, checkPasswordPart1)
+}
+
+func part2(input []string) int {
+	return solvePart(input, checkPasswordPart2)
 }
 
 func main() {
@@ -47,4 +55,5 @@ func main() {
 	passwordList := strings.Split(strings.Trim(string(blob), "\n"), "\n")
 	// passwordList := []string{"1-3 a: abcde", "1-3 b: cdefg", "2-9 c: ccccccccc"}
 	fmt.Printf("Part 1: %v\n", part1(passwordList))
+	fmt.Printf("Part 2: %v\n", part2(passwordList))
 }
