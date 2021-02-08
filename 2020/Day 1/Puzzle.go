@@ -77,7 +77,7 @@ func grabInput(filename string) []int {
 }
 
 func main() {
-	expenses := grabInput("Puzzle input.txt")
+	expenses := grabInput("input.txt")
 	// expenses := []int{1721, 979, 366, 299, 675, 1456}
 	// expenses := []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 20, 21, 800, 811, 822, 833, 844, 1009, 1010, 1209}
 	sortList(expenses)
