@@ -9,29 +9,37 @@ import (
 	"strings"
 )
 
-func part1(input []string) (count int) {
+func solvePart(input []string, checkPasswd func(int, int, string, string) bool) (count int) {
 	policyPattern := regexp.MustCompile(`(\d+)-(\d+) ([a-z]): ([a-z]+)`)
 	for _, policy := range input {
-		if checkPolicy(policy, policyPattern) {
+		if checkPolicy(policy, policyPattern, checkPasswd) {
 			count++
 		}
 	}
 	return count
 }
 
-func checkPolicy(policy string, pattern *regexp.Regexp) bool {
+func checkPolicy(policy string, pattern *regexp.Regexp, checkPasswd func(int, int, string, string) bool) bool {
 	extracted := pattern.FindStringSubmatch(policy)
-	min, err := strconv.Atoi(extracted[1])
+	first, err := strconv.Atoi(extracted[1])
 	if err != nil {
 		log.Fatalf("checkPolicy: Parsing %s out of %s failed\n", extracted[1], policy)
 	}
-	max, err := strconv.Atoi(extracted[2])
+	second, err := strconv.Atoi(extracted[2])
 	if err != nil {
 		log.Fatalf("checkPolicy: Parsing %s out of %s failed\n", extracted[2], policy)
 	}
 	character, password := extracted[3], extracted[4]
+	return checkPasswd(first, second, character, password)
+}
+
+func checkPasswordPart1(min, max int, character, password string) bool {
 	count := strings.Count(password, character)
 	return min <= count && count <= max
+}
+
+func part1(input []string) int {
+	return solvePart(input, checkPasswordPart1)
 }
 
 func main() {
