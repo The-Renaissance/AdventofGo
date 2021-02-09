@@ -19,6 +19,24 @@ func solvePart1(inputMap []string, right, down int) int {
 	return count
 }
 
+func solvePart2(inputMap []string) int {
+	multResult := 1
+	type slope struct {
+		right, down int
+	}
+	slopes := []slope{
+		{1, 1},
+		{3, 1},
+		{5, 1},
+		{7, 1},
+		{1, 2},
+	}
+	for _, slope := range slopes {
+		multResult *= solvePart1(inputMap, slope.right, slope.down)
+	}
+	return multResult
+}
+
 func readMap(filename string) []string {
 	f, err := ioutil.ReadFile(filename)
 	if err != nil {
@@ -47,4 +65,5 @@ func main() {
 	rightStep := 3
 	downStep := 1
 	fmt.Printf("Part 1: %v\n", solvePart1(inputMap, rightStep, downStep))
+	fmt.Printf("Part 2: %v\n", solvePart2(inputMap))
 }
