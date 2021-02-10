@@ -72,10 +72,21 @@ func solvePart1(boardingPasses []string) int {
 func solvePart2(boardingPasses []string) int {
 	seatList := getSortedSeatlist(boardingPasses)
 	var vacantSeat int
-	for i, seat := range seatList {
-		if seatList[i+1]-seat > 1 {
-			vacantSeat = seat + 1
-			break
+	for seatL, seatR := 0, len(seatList)-1; seatR-seatL > 1; {
+		mid := (seatL + seatR) / 2
+		midSeat := seatList[seatL] + mid - seatL
+		if seatList[mid] > midSeat {
+			if seatList[mid-1] == seatList[mid]-2 {
+				vacantSeat = midSeat
+				break
+			}
+			seatR = mid
+		} else {
+			if seatList[mid+1] == seatList[mid]+2 {
+				vacantSeat = midSeat + 1
+				break
+			}
+			seatL = mid
 		}
 	}
 	return vacantSeat
