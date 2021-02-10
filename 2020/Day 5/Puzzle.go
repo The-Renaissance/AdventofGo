@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"sort"
 	"strings"
 )
 
@@ -54,21 +55,34 @@ func grabBoardingPasses(filename string) []string {
 	return strings.Split(strings.Trim(string(l), "\n"), "\n")
 }
 
-func solvePart1(boardingPasses []string) int {
+func getSortedSeatlist(boardingPasses []string) []int {
 	seatList := make([]int, 0, len(boardingPasses))
 	for _, bp := range boardingPasses {
 		seatList = append(seatList, getSeatID(bp))
 	}
-	max := 0
-	for _, seatID := range seatList {
-		if seatID > max {
-			max = seatID
+	sort.Ints(seatList)
+	return seatList
+}
+
+func solvePart1(boardingPasses []string) int {
+	seatList := getSortedSeatlist(boardingPasses)
+	return seatList[len(seatList)-1]
+}
+
+func solvePart2(boardingPasses []string) int {
+	seatList := getSortedSeatlist(boardingPasses)
+	var vacantSeat int
+	for i, seat := range seatList {
+		if seatList[i+1]-seat > 1 {
+			vacantSeat = seat + 1
+			break
 		}
 	}
-	return max
+	return vacantSeat
 }
 
 func main() {
 	boardingPasses := grabBoardingPasses("input.txt")
-	fmt.Printf("Part 1: %v", solvePart1(boardingPasses))
+	fmt.Printf("Part 1: %v\n", solvePart1(boardingPasses))
+	fmt.Printf("Part 2: %v\n", solvePart2(boardingPasses))
 }
