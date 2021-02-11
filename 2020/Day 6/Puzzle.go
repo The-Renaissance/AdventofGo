@@ -17,6 +17,22 @@ func countUniqueAnswers(answers []string) int {
 	return len(unique)
 }
 
+func countEveryonesAnswers(answers []string) int {
+	answerMap := make(map[rune]int, 26)
+	for _, line := range answers {
+		for _, c := range line {
+			answerMap[c]++
+		}
+	}
+	total := 0
+	for _, count := range answerMap {
+		if count == len(answers) {
+			total++
+		}
+	}
+	return total
+}
+
 func splitbyEmptyLine(input []string) [][]string {
 	groupedLines := [][]string{}
 	currentGroup := []string{}
@@ -51,7 +67,17 @@ func solvePart1(input []string) int {
 	return total
 }
 
+func solvePart2(input []string) int {
+	answers := splitbyEmptyLine(input)
+	total := 0
+	for _, answer := range answers {
+		total += countEveryonesAnswers(answer)
+	}
+	return total
+}
+
 func main() {
 	input := grabInput("input.txt")
 	fmt.Println("Part 1:", solvePart1(input))
+	fmt.Println("Part 2:", solvePart2(input))
 }
