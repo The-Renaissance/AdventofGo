@@ -22,6 +22,31 @@ func solvePart1(xmas []int, preambleLen int) int {
 	return result
 }
 
+func solvePart2(xmas []int, want int) (smallest, largest int) {
+	start, end := 0, 1
+	for start <= end {
+		if sum := sum(xmas[start : end+1]); sum == want {
+			break
+		} else if sum < want {
+			end++
+		} else {
+			start++
+		}
+	}
+	list := make([]int, end-start+1)
+	copy(list, xmas[start:end+1])
+	sort.Ints(list)
+	return list[0], list[len(list)-1]
+}
+
+func sum(list []int) int {
+	sum := 0
+	for _, num := range list {
+		sum += num
+	}
+	return sum
+}
+
 func checkNumber(preambles []int, number int) (found bool) {
 	sort.Ints(preambles)
 	leftIndex := 0
@@ -60,6 +85,10 @@ func getInput(filename string) []string {
 }
 
 func main() {
+	const preambleLen = 25
 	xmas := parseList("input.txt")
-	fmt.Printf("Part 1: %v\n", solvePart1(xmas, 25))
+	invalidNumber := solvePart1(xmas, preambleLen)
+	fmt.Printf("Part 1: %v\n", invalidNumber)
+	smallest, largest := solvePart2(xmas, invalidNumber)
+	fmt.Printf("Part 2: %v\n", smallest+largest)
 }
