@@ -31,7 +31,7 @@ func FindNumberofDifferences(adapters []int) (onejolts, threejolts int) {
 
 func parseList(filename string) []int {
 	lines := getInput(filename)
-	list := make([]int, len(lines))
+	list := make([]int, 0, len(lines))
 	for i, line := range lines {
 		if num, err := strconv.Atoi(line); err != nil {
 			log.Panicf("parsing %v at line %v failed\n", line, i+1)
