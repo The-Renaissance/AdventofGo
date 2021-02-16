@@ -35,12 +35,13 @@ func FindArrangements(adapters []int) int {
 	dp := make([]int, adapters[len(adapters)-1]+1)
 	dp[0] = 1
 	diffs := []int{1, 2, 3}
+	currentIt := 0
 	for joltage, ways := range dp {
 		if ways == 0 {
 			continue
 		}
 		for _, diff := range diffs {
-			if joltage+diff < len(dp) && findAdapter(joltage+diff, adapters) {
+			if joltage+diff < len(dp) && findAdapter(joltage+diff, adapters, &currentIt, diffs[len(diffs)-1]) {
 				dp[joltage+diff] += ways
 			}
 		}
@@ -48,9 +49,13 @@ func FindArrangements(adapters []int) int {
 	return dp[len(dp)-1]
 }
 
-func findAdapter(joltage int, adapters []int) bool {
-	for _, jolt := range adapters {
-		if jolt == joltage {
+func findAdapter(joltage int, adapters []int, index *int, maxRange int) bool {
+	for i := -maxRange; i <= maxRange && *index+i < len(adapters); i++ {
+		if *index+i < 0 {
+			continue
+		}
+		if joltage == adapters[*index+i] {
+			*index += i
 			return true
 		}
 	}
