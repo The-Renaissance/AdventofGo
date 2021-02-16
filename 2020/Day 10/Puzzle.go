@@ -29,6 +29,31 @@ func FindNumberofDifferences(adapters []int) (onejolts, threejolts int) {
 	return
 }
 
+// FindArrangements finds number of arrangements to form a valid chain from the adapters
+func FindArrangements(adapters []int) int {
+	sort.Ints(adapters)
+	dp := make([]int, adapters[len(adapters)-1]+1)
+	dp[0] = 1
+	diffs := []int{1, 2, 3}
+	for joltage, ways := range dp {
+		for _, diff := range diffs {
+			if joltage+diff < len(dp) && findAdapter(joltage+diff, adapters) {
+				dp[joltage+diff] += ways
+			}
+		}
+	}
+	return dp[len(dp)-1]
+}
+
+func findAdapter(joltage int, adapters []int) bool {
+	for _, jolt := range adapters {
+		if jolt == joltage {
+			return true
+		}
+	}
+	return false
+}
+
 func parseList(filename string) []int {
 	lines := getInput(filename)
 	list := make([]int, 0, len(lines))
@@ -56,6 +81,13 @@ func solvePart1() {
 	fmt.Printf("Part 1: %v\n", onejolts*threejolts)
 }
 
+func solvePart2() {
+	adapters := parseList("input.txt")
+	arrangements := FindArrangements(adapters)
+	fmt.Printf("Part 2: %v\n", arrangements)
+}
+
 func main() {
 	solvePart1()
+	solvePart2()
 }
