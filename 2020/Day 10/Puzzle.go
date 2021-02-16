@@ -36,6 +36,9 @@ func FindArrangements(adapters []int) int {
 	dp[0] = 1
 	diffs := []int{1, 2, 3}
 	for joltage, ways := range dp {
+		if ways == 0 {
+			continue
+		}
 		for _, diff := range diffs {
 			if joltage+diff < len(dp) && findAdapter(joltage+diff, adapters) {
 				dp[joltage+diff] += ways
