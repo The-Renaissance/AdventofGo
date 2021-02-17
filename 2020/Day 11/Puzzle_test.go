@@ -7,9 +7,11 @@ import (
 
 func TestFloorState_AdvanceState(t *testing.T) {
 	tests := []struct {
-		name string
-		s    *FloorState
-		next SeatMap
+		name         string
+		s            *FloorState
+		quota        int
+		adjacentFunc AdjacentFunc
+		next         SeatMap
 	}{
 		{
 			"Case 1",
@@ -27,6 +29,8 @@ func TestFloorState_AdvanceState(t *testing.T) {
 					[]rune("L.LLLLL.LL"),
 				},
 			},
+			4,
+			GetImmediateAdjacents,
 			SeatMap{
 				[]rune("#.##.##.##"),
 				[]rune("#######.##"),
@@ -56,6 +60,8 @@ func TestFloorState_AdvanceState(t *testing.T) {
 					[]rune("#.#L#L#.##"),
 				},
 			},
+			4,
+			GetImmediateAdjacents,
 			SeatMap{
 				[]rune("#.#L.L#.##"),
 				[]rune("#LLL#LL.L#"),
@@ -73,7 +79,7 @@ func TestFloorState_AdvanceState(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Logf("Testing state: \n%s", tt.s.current.PPrint())
-			tt.s.AdvanceState()
+			tt.s.AdvanceState(tt.quota, tt.adjacentFunc)
 			if !reflect.DeepEqual(tt.s.current, tt.next) {
 				t.Errorf("Want: \n%s\n\n, got \n\n%s", tt.next.PPrint(), tt.s.current.PPrint())
 			}
@@ -83,9 +89,11 @@ func TestFloorState_AdvanceState(t *testing.T) {
 
 func TestFloorState_RunandCount(t *testing.T) {
 	tests := []struct {
-		name string
-		s    *FloorState
-		want int
+		name         string
+		s            *FloorState
+		quota        int
+		adjacentFunc AdjacentFunc
+		want         int
 	}{
 		{
 			"Example",
@@ -103,12 +111,14 @@ func TestFloorState_RunandCount(t *testing.T) {
 					"L.LLLLL.LL",
 				},
 			),
+			4,
+			GetImmediateAdjacents,
 			37,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := tt.s.RunandCount(); got != tt.want {
+			if got := tt.s.RunandCount(tt.quota, tt.adjacentFunc); got != tt.want {
 				t.Errorf("FloorState.RunandCount() = %v, want %v", got, tt.want)
 			}
 		})

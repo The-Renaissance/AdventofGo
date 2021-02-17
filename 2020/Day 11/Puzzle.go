@@ -31,8 +31,11 @@ type Position struct {
 	row, column int
 }
 
+// AdjacentFunc is a type of function that accepts position and seat state and returns adjacent positions
+type AdjacentFunc func(*FloorState, Position) []Position
+
 // AdvanceState runs one step of the simulation
-func (s *FloorState) AdvanceState() {
+func (s *FloorState) AdvanceState(occupiedSeatQuota int, adjacentFunc AdjacentFunc) {
 	if s.previous == nil {
 		s.previous = make([][]rune, len(s.current))
 	}
@@ -42,7 +45,7 @@ func (s *FloorState) AdvanceState() {
 	}
 	for i, row := range s.previous {
 		for j, seat := range row {
-			adjacents := s.getadjacents(Position{i, j})
+			adjacents := adjacentFunc(s, Position{i, j})
 			if seat == 'L' {
 				noOccupied := true
 				for _, adjseat := range adjacents {
@@ -61,7 +64,7 @@ func (s *FloorState) AdvanceState() {
 						occupiedSeatCount++
 					}
 				}
-				if occupiedSeatCount >= 4 {
+				if occupiedSeatCount >= occupiedSeatQuota {
 					s.current[i][j] = 'L'
 				}
 			}
@@ -70,9 +73,9 @@ func (s *FloorState) AdvanceState() {
 }
 
 // RunandCount runs the simulation up until previous == current then counts occupied seats
-func (s *FloorState) RunandCount() int {
+func (s *FloorState) RunandCount(quota int, adjacentFunc AdjacentFunc) int {
 	for !reflect.DeepEqual(s.previous, s.current) {
-		s.AdvanceState()
+		s.AdvanceState(quota, adjacentFunc)
 	}
 	occupiedSeatCount := 0
 	for _, row := range s.current {
@@ -85,7 +88,8 @@ func (s *FloorState) RunandCount() int {
 	return occupiedSeatCount
 }
 
-func (s *FloorState) getadjacents(p Position) []Position {
+// GetImmediateAdjacents returns the adjacent seats immediately surrounding position p
+func GetImmediateAdjacents(s *FloorState, p Position) []Position {
 	rows, columns := len(s.current), len(s.current[0])
 	i, j := p.row, p.column
 	var pos []Position
@@ -136,9 +140,10 @@ func getInput(filename string) []string {
 }
 
 func solvePart1() {
+	const occupiedSeatQuota = 4
 	init := getInput("input.txt")
 	fs := FromInitialState(init)
-	fmt.Printf("Part 1: %v\n", fs.RunandCount())
+	fmt.Printf("Part 1: %v\n", fs.RunandCount(occupiedSeatQuota, GetImmediateAdjacents))
 }
 
 func main() {
