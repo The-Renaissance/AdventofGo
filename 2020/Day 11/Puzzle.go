@@ -120,6 +120,50 @@ func GetImmediateAdjacents(s *FloorState, p Position) []Position {
 	return pos
 }
 
+// GetVisibleAdjacents returns all visible adjacent seats from current position p
+func GetVisibleAdjacents(s *FloorState, p Position) []Position {
+	rows, columns := len(s.current), len(s.current[0])
+	i, j := p.row, p.column
+	var pos []Position
+	if i > 0 && j > 0 {
+		pos = append(pos, s.traverseMap(p, -1, -1)) // Position{i - 1, j - 1}
+	}
+	if i > 0 {
+		pos = append(pos, s.traverseMap(p, 0, -1)) // Position{i - 1, j}
+	}
+	if i > 0 && j+1 < columns {
+		pos = append(pos, s.traverseMap(p, 1, -1)) // Position{i - 1, j + 1}
+	}
+	if j > 0 {
+		pos = append(pos, s.traverseMap(p, -1, 0)) // Position{i, j - 1}
+	}
+	if j+1 < columns {
+		pos = append(pos, s.traverseMap(p, 1, 0)) // Position{i, j + 1}
+	}
+	if i+1 < rows && j > 0 {
+		pos = append(pos, s.traverseMap(p, -1, 1)) // Position{i + 1, j - 1}
+	}
+	if i+1 < rows {
+		pos = append(pos, s.traverseMap(p, 0, 1)) // Position{i + 1, j}
+	}
+	if i+1 < rows && j+1 < columns {
+		pos = append(pos, s.traverseMap(p, 1, 1)) // Position{i + 1, j + 1}
+	}
+	return pos
+}
+
+func (s *FloorState) traverseMap(pos Position, hStep, vStep int) Position {
+	y, x := pos.row, pos.column
+	for 0 <= x+hStep && x+hStep < len(s.previous[0]) && 0 <= y+vStep && y+vStep < len(s.previous) {
+		y += vStep
+		x += hStep
+		if s.previous[y][x] == '#' || s.previous[y][x] == 'L' {
+			return Position{row: y, column: x}
+		}
+	}
+	return Position{row: y, column: x}
+}
+
 // FromInitialState returns a FloorState struct from an initial state
 func FromInitialState(init []string) *FloorState {
 	fs := FloorState{
@@ -146,6 +190,14 @@ func solvePart1() {
 	fmt.Printf("Part 1: %v\n", fs.RunandCount(occupiedSeatQuota, GetImmediateAdjacents))
 }
 
+func solvePart2() {
+	const occupiedSeatQuota = 5
+	init := getInput("input.txt")
+	fs := FromInitialState(init)
+	fmt.Printf("Part 2: %v\n", fs.RunandCount(occupiedSeatQuota, GetVisibleAdjacents))
+}
+
 func main() {
 	solvePart1()
+	solvePart2()
 }
