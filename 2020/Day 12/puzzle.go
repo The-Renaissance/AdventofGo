@@ -13,6 +13,7 @@ import (
 type Ship struct {
 	ew, ns  int
 	heading int
+	w       Waypoint
 }
 
 // East moves ship east
@@ -98,11 +99,91 @@ func (s *Ship) ExecuteInstruction(ins string) error {
 	return nil
 }
 
-// NewShip creates a new ship heading east
+// NewShip creates a new ship heading east and a waypoint at 10 east, 1 north
 func NewShip() *Ship {
 	return &Ship{
 		heading: 90,
+		w: Waypoint{
+			ew: 10,
+			ns: 1,
+		},
 	}
+}
+
+// Waypoint denotes a waypoint's position relative to the ship
+type Waypoint struct {
+	ns, ew int
+}
+
+// East moves waypoint east
+func (w *Waypoint) East(dist int) {
+	w.ew += dist
+}
+
+// West moves waypoint west
+func (w *Waypoint) West(dist int) {
+	w.ew -= dist
+}
+
+// North moves waypoint north
+func (w *Waypoint) North(dist int) {
+	w.ns += dist
+}
+
+// South moves waypoint south
+func (w *Waypoint) South(dist int) {
+	w.ns -= dist
+}
+
+// Left rotates a waypoint left by deg degrees
+func (w *Waypoint) Left(deg int) {
+	rad := float64(deg) / 180.0 * math.Pi
+	newWaypoint := Waypoint{
+		ew: int(math.Round(math.Cos(rad)*float64(w.ew) - math.Sin(rad)*float64(w.ns))),
+		ns: int(math.Round(math.Sin(rad)*float64(w.ew) + math.Cos(rad)*float64(w.ns))),
+	}
+	*w = newWaypoint
+}
+
+// Right rotates a waypoint right by deg degrees
+func (w *Waypoint) Right(deg int) {
+	w.Left(-deg)
+}
+
+// MovetoWaypoint moves the ship to the waypoint as many times as needed
+func (s *Ship) MovetoWaypoint(times int) {
+	for i := 0; i < times; i++ {
+		s.ew += s.w.ew
+		s.ns += s.w.ns
+	}
+}
+
+// ExecuteInstructionPart2 executes an instruction according to Part 2
+func (s *Ship) ExecuteInstructionPart2(ins string) error {
+	dir := ins[0]
+	dist, err := strconv.Atoi(ins[1:])
+	if err != nil {
+		return err
+	}
+	switch dir {
+	case 'E':
+		s.w.East(dist)
+	case 'W':
+		s.w.West(dist)
+	case 'N':
+		s.w.North(dist)
+	case 'S':
+		s.w.South(dist)
+	case 'L':
+		s.w.Left(dist)
+	case 'R':
+		s.w.Right(dist)
+	case 'F':
+		s.MovetoWaypoint(dist)
+	default:
+		return fmt.Errorf("%q is not a valid direction", dir)
+	}
+	return nil
 }
 
 func getInput(filename string) []string {
@@ -122,6 +203,16 @@ func solvePart1() {
 	fmt.Printf("Part 1: %v\n", s.GetDistance())
 }
 
+func solvePart2() {
+	instructions := getInput("input.txt")
+	s := NewShip()
+	for _, instruction := range instructions {
+		s.ExecuteInstructionPart2(instruction)
+	}
+	fmt.Printf("Part 2: %v\n", s.GetDistance())
+}
+
 func main() {
 	solvePart1()
+	solvePart2()
 }
