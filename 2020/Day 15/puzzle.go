@@ -27,4 +27,5 @@ func getNumberInSequence(input []int, sequencenr int) int {
 func main() {
 	input := []int{0, 20, 7, 16, 1, 18, 15}
 	fmt.Printf("Part 1: %v\n", getNumberInSequence(input, 2020))
+	fmt.Printf("Part 2: %v\n", getNumberInSequence(input, 30000000))
 }
